@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import debounce from "lodash.debounce";
+
 type User = {
   login: string;
 };
@@ -19,7 +21,6 @@ const Search: React.FC = () => {
   const [repos, setRepos] = useState(initialState);
 
   const handleChange = (e: any) => {
-    e.preventDefault();
     setUsers(e.target.value);
   };
 
@@ -40,20 +41,25 @@ const Search: React.FC = () => {
       });
   }, [users]);
 
+  const debouncedOnChange = debounce(handleChange, 500);
+
   console.log(repos);
   return (
     <>
       <input
         type="text"
         placeholder=" search github user"
-        onChange={handleChange}
+        onChange={debouncedOnChange}
       />
-      {repos.message ? repos.message : null}
-      <ul>
-        {repos.items?.map((item: any) => {
-          return <li>{item.login}</li>;
-        })}
-      </ul>
+      {repos.message ? (
+        repos.message
+      ) : (
+        <ul>
+          {repos.items?.map((item: any) => {
+            return <li key={item.id}>{item.login}</li>;
+          })}
+        </ul>
+      )}
     </>
   );
 };
